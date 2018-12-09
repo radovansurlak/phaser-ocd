@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 //this game will have only 1 state
 export default {
 
@@ -54,6 +56,8 @@ export default {
 		this.game.add.text(350, 40, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
 		this.game.add.text(350, 100, 'Circles left: ', style);
 
+		let button = this.game.add.button(350, 150, 'button', this.onDoneButtonClick, this, 2, 1, 0);
+
 		style = { font: '25px Arial', fill: '#0d50bc' };
 		this.circleScore = this.game.add.text(450, 95, '', style);
 
@@ -67,6 +71,30 @@ export default {
 
 		// debugging
 		this.result = '';
+	},
+
+	onDoneButtonClick() {
+		const headers = {
+			'Access-Control-Allow-Origin': '*',
+			'Content-Type': 'application/json',
+		}
+		if (!this.circlesLeft) {
+			let data = {
+				matrix: this.gridMatrix,
+				dots: this.dots,
+			};
+			
+			let JSONData = JSON.stringify(data);
+
+			console.log(JSON.parse(JSONData));
+			console.log('sending results');
+
+			// axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
+			// 	.then((res, err) => {
+			// 		if (err) return console.error(err);
+			// 		console.log(res);
+			// 	})
+		}
 	},
 
 	update: function () {
@@ -114,7 +142,13 @@ export default {
 	},
 
 	onDragStart: function (sprite) {
-		
+		if (!this.gameStartTimestamp) {
+			this.gameStartTimestamp = + new Date();
+			console.log('from the first function' + this.gameStartTimestamp)
+		}
+
+		console.log(this.gameStartTimestamp)
+
 		console.log(this.circle.input.pointerDragged());
 
 		sprite.dragStartTime = + new Date();
@@ -160,13 +194,13 @@ export default {
 	onDragStop: function (sprite) {
 		console.log(this.circle.input.pointerDragged());
 		console.log('dragStop event...')
-		
+
 		sprite.dragEndTime = + new Date();
 
 		let coord = this.getCoord(sprite);
 		// debug
 		console.log(coord);
-	
+
 		if (sprite.id) {
 			console.log(`Id: ${sprite.id}`)
 			this.dots[sprite.id - 1].positions.push({
@@ -197,7 +231,7 @@ export default {
 		}
 		*/
 		// Second, we find the coordinates of the current location (within the frame)
-		
+
 		this.seeGrid();
 
 		// Third, we check if this is the location is occupied
@@ -305,19 +339,7 @@ export default {
 			}
 		}
 		return gridString;
-		// const headers = {
-		// 	'Access-Control-Allow-Origin': '*',
-		// 	'Content-Type': 'application/json',
-		// }
-		// if (!this.circlesLeft) {
-		// 	const data = JSON.stringify(this.gridMatrix);
-		// 	console.log('sending results');
-		// 	axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
-		// 		.then((res, err) => {
-		// 			if (err) return console.error(err);
-		// 			console.log(res);
-		// 		})
-		// }
+
 	},
 	snapToGrid: function (sprite) {
 		for (var i = 0; i < this.rect.length; i++) {

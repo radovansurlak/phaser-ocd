@@ -1,4 +1,5 @@
 import { circle } from '../../assets/images/*.png'
+import { button } from '../../assets/images/*.svg'
 
 export default {
     preload: function() {
@@ -14,6 +15,7 @@ export default {
         this.circle = this.load.spritesheet('circle', circle, 85, 85, 3);
 //        this.circle.anchor.setTo(0.5);
 //        this.circle.scale(0.5);
+    		this.game.load.image('button', button);
     },
     create: function() {
         this.state.start('HomeState');
