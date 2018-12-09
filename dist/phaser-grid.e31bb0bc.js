@@ -37471,6 +37471,7 @@ var _default = {
   },
   onDragStart: function onDragStart(sprite) {
     console.log(this.circle.input.pointerDragged());
+    sprite.dragStartTime = +new Date();
     sprite.frame = 2; // make circle grey whilst being dragged
     //        if (this.justAClick(sprite)) {return;} // if the user just clicked (no drag), do nothing
     // check if this is the initial move or subsequent move for circle
@@ -37500,23 +37501,31 @@ var _default = {
 
     this.result = 'dragging ' + sprite.key;
   },
+  handleTimeData: function handleTimeData(sprite) {
+    return {
+      startTimestamp: sprite.dragStartTime,
+      endTimestamp: sprite.dragEndTime,
+      durationInMs: sprite.dragEndTime - sprite.dragStartTime
+    };
+  },
   onDragStop: function onDragStop(sprite) {
     console.log(this.circle.input.pointerDragged());
     console.log('dragStop event...');
+    sprite.dragEndTime = +new Date();
     var coord = this.getCoord(sprite); // debug
 
     console.log(coord);
 
     if (sprite.id) {
       console.log("Id: ".concat(sprite.id));
-      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord));
+      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord, this.handleTimeData(sprite)));
       console.log(this.dots);
     } else {
       sprite.id = this.spriteIdCounter++;
       this.dots.push({
         positions: []
       });
-      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord));
+      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord, this.handleTimeData(sprite)));
       console.log(this.dots);
     }
     /*

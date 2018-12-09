@@ -114,7 +114,11 @@ export default {
 	},
 
 	onDragStart: function (sprite) {
+		
 		console.log(this.circle.input.pointerDragged());
+
+		sprite.dragStartTime = + new Date();
+
 		sprite.frame = 2; // make circle grey whilst being dragged
 
 		//        if (this.justAClick(sprite)) {return;} // if the user just clicked (no drag), do nothing
@@ -145,25 +149,45 @@ export default {
 		this.result = 'dragging ' + sprite.key;
 	},
 
+	handleTimeData(sprite) {
+		return {
+			startTimestamp: sprite.dragStartTime,
+			endTimestamp: sprite.dragEndTime,
+			durationInMs: sprite.dragEndTime - sprite.dragStartTime,
+		}
+	},
+
 	onDragStop: function (sprite) {
 		console.log(this.circle.input.pointerDragged());
 		console.log('dragStop event...')
-		var coord = this.getCoord(sprite);
+		
+		sprite.dragEndTime = + new Date();
+
+		let coord = this.getCoord(sprite);
 		// debug
 		console.log(coord);
 	
 		if (sprite.id) {
 			console.log(`Id: ${sprite.id}`)
-			this.dots[sprite.id - 1].positions.push({...coord})
+			this.dots[sprite.id - 1].positions.push({
+				...coord,
+				...this.handleTimeData(sprite)
+			})
 			console.log(this.dots);
 		} else {
 			sprite.id = this.spriteIdCounter++;
 			this.dots.push({
 				positions: [],
 			})
-			this.dots[sprite.id - 1].positions.push({...coord})
+			this.dots[sprite.id - 1].positions.push({
+				...coord,
+				...this.handleTimeData(sprite)
+			})
 			console.log(this.dots);
 		}
+
+
+
 		/*
 		// First, we check for overlap with the whole grid frame and reset circle if out of bounds
 		if (!Phaser.Rectangle.intersects(sprite.getBounds(), this.frame)) {
