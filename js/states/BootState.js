@@ -1,4 +1,6 @@
-export default = {
+import { bar, logo } from '../../assets/images/*.png'
+
+export default {
     //initiate some game-level settings
     init: function() {
         //scaling options
@@ -16,8 +18,8 @@ export default = {
 
     },
     preload: function() {
-        this.load.image('preloadBar', 'assets/images/bar.png');
-        this.load.image('logo', 'assets/images/logo.png');
+        this.load.image('preloadBar', bar);
+        this.load.image('logo', logo);
     },
     create: function () {
         this.game.stage.backgroundColor = '#fff';

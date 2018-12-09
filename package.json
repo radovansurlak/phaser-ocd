@@ -13,8 +13,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "p2": "^0.7.1",
     "parcel-bundler": "^1.10.3",
-    "phaser": "2.6.2",
+    "phaser": "^3.15.1",
+    "phaser-ce": "2.11.1",
+    "pixi": "^0.3.1",
+    "pixi.js": "^4.8.3",
     "vue": "^2.5.18",
     "vue-hot-reload-api": "^2.3.1",
     "vue-router": "^3.0.2",

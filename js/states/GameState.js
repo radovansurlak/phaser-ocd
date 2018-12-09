@@ -1,6 +1,3 @@
-"use strict"; // let's capture all errors
-
-
 //this game will have only 1 state
 export default {
 
@@ -62,7 +59,7 @@ export default {
 	// draw grid
 	drawGrid: function () {
 
-		this.grid = game.add.graphics(this.GRID_START_X, this.GRID_START_Y);
+		this.grid = this.game.add.graphics(this.GRID_START_X, this.GRID_START_Y);
 		this.grid.lineStyle(this.GRID_WIDTH, '#000', 1);
 		//       this.grid.boundsPadding = 0; // from default of 10
 
@@ -83,7 +80,7 @@ export default {
 	drawCircles: function () {
 		// draw circles in the centre of the grid, first move graphics pointer to the centre
 
-		this.circles = game.add.group(); // group for all circles
+		this.circles = this.game.add.group(); // group for all circles
 		this.circles.enableBody = true;
 		for (var i = 0; i < this.NUM_CIRCLES; i++) {
 			this.circle = this.circles.create(this.frame.centerX, this.frame.centerY, 'circle');
@@ -241,7 +238,7 @@ export default {
 		this.circleScore.text = this.circlesLeft;
 	},
 
-	seeGrid: async function () {
+	seeGrid: function () {
 		var gridString = '';
 
 		for (var i = 0; i < this.NUM_ROWS; i++) {
@@ -254,15 +251,15 @@ export default {
 			'Access-Control-Allow-Origin': '*',
 			'Content-Type': 'application/json',
 		}
-		if (!this.circlesLeft) {
-			const data = JSON.stringify(this.gridMatrix);
-			console.log('sending results');
-			axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
-				.then((res, err) => {
-					if (err) return console.error(err);
-					console.log(res);
-				})
-		}
+		// if (!this.circlesLeft) {
+		// 	const data = JSON.stringify(this.gridMatrix);
+		// 	console.log('sending results');
+		// 	axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
+		// 		.then((res, err) => {
+		// 			if (err) return console.error(err);
+		// 			console.log(res);
+		// 		})
+		// }
 	},
 	snapToGrid: function (sprite) {
 		for (var i = 0; i < this.rect.length; i++) {
@@ -274,8 +271,8 @@ export default {
 		}
 	},
 	justAClick: function (sprite) {
-		var distanceFromLastUp = Phaser.Math.distance(game.input.activePointer.positionDown.x,
-			game.input.activePointer.positionDown.y, game.input.activePointer.x, game.input.activePointer.y);
+		var distanceFromLastUp = Phaser.Math.distance(this.game.input.activePointer.positionDown.x,
+			this.game.input.activePointer.positionDown.y, this.game.input.activePointer.x, this.game.input.activePointer.y);
 		return distanceFromLastUp != 0;
 	},
 	/*
