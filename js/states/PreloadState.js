@@ -1,4 +1,4 @@
-var PreloadState = {
+export default {
     preload: function() {
         //load the game assets before the game starts
         this.logo = this.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');

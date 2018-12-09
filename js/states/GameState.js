@@ -2,8 +2,7 @@
 
 
 //this game will have only 1 state
-var GameState;
-GameState = {
+export default {
 
 	//executed after everything is loaded
 	create: function () {

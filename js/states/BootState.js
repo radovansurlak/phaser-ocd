@@ -1,4 +1,4 @@
-var BootState = {
+export default = {
     //initiate some game-level settings
     init: function() {
         //scaling options

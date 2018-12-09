@@ -1,4 +1,4 @@
-var HomeState = {
+export default {
 
     init: function(message) {
         this.message = message;
