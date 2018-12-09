@@ -74,27 +74,38 @@ export default {
 	},
 
 	onDoneButtonClick() {
+		if (!!this.circlesLeft) {
+			alert('You have to place all the remaining circles on the grid');
+			return;
+		}
+
 		const headers = {
 			'Access-Control-Allow-Origin': '*',
 			'Content-Type': 'application/json',
 		}
-		if (!this.circlesLeft) {
-			let data = {
-				matrix: this.gridMatrix,
-				dots: this.dots,
-			};
-			
-			let JSONData = JSON.stringify(data);
 
-			console.log(JSON.parse(JSONData));
-			console.log('sending results');
+		let userData = JSON.parse(localStorage.getItem('userData'));
 
-			// axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
-			// 	.then((res, err) => {
-			// 		if (err) return console.error(err);
-			// 		console.log(res);
-			// 	})
-		}
+		let data = {
+			matrix: this.gridMatrix,
+			dots: this.dots,
+			userData,
+		};
+
+		let JSONData = JSON.stringify(data);
+
+		console.log(JSON.parse(JSONData));
+		console.log('sending results');
+
+		axios.post('http://127.0.0.1:3000/result', JSONData, { headers: headers })
+			.then((res, err) => {
+				if (err) return console.error(err);
+				console.log(res);
+				localStorage.setItem('gridTestDone', true);
+				window.location.replace("/");
+			})
+
+
 	},
 
 	update: function () {

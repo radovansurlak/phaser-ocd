@@ -37024,11 +37024,14 @@ var _default = {
   computed: {
     formFilled: function formFilled() {
       return this.dataConsent && this.$refs.form.validate();
+    },
+    gridTestDone: function gridTestDone() {
+      return localStorage.getItem('gridTestDone') === 'true' || false;
     }
   },
   methods: {
     playGame: function playGame(game) {
-      this.$root.userData = this.userSelection;
+      localStorage.setItem('userData', JSON.stringify(this.userSelection));
       this.$router.push(game);
     }
   }
@@ -37182,7 +37185,10 @@ exports.default = _default;
                           _c(
                             "v-btn",
                             {
-                              attrs: { large: "", disabled: !_vm.formFilled },
+                              attrs: {
+                                large: "",
+                                disabled: !_vm.formFilled || _vm.gridTestDone
+                              },
                               on: {
                                 click: function($event) {
                                   _vm.playGame("grid")
@@ -39092,24 +39098,33 @@ var _default = {
     this.result = '';
   },
   onDoneButtonClick: function onDoneButtonClick() {
+    if (!!this.circlesLeft) {
+      alert('You have to place all the remaining circles on the grid');
+      return;
+    }
+
     var headers = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json'
     };
+    var userData = JSON.parse(localStorage.getItem('userData'));
+    var data = {
+      matrix: this.gridMatrix,
+      dots: this.dots,
+      userData: userData
+    };
+    var JSONData = JSON.stringify(data);
+    console.log(JSON.parse(JSONData));
+    console.log('sending results');
 
-    if (!this.circlesLeft) {
-      var data = {
-        matrix: this.gridMatrix,
-        dots: this.dots
-      };
-      var JSONData = JSON.stringify(data);
-      console.log(JSON.parse(JSONData));
-      console.log('sending results'); // axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
-      // 	.then((res, err) => {
-      // 		if (err) return console.error(err);
-      // 		console.log(res);
-      // 	})
-    }
+    _axios.default.post('http://127.0.0.1:3000/result', JSONData, {
+      headers: headers
+    }).then(function (res, err) {
+      if (err) return console.error(err);
+      console.log(res);
+      localStorage.setItem('gridTestDone', true);
+      window.location.replace("/");
+    });
   },
   update: function update() {//      this.refreshStats(0);
   },
@@ -39491,13 +39506,10 @@ var router = new _vueRouter.default({
 new _vue.default({
   el: '#app',
   router: router,
-  data: {
-    userData: {}
-  },
-  template: '<App/>',
   components: {
     App: _App.default
-  }
+  },
+  template: '<App/>'
 });
 },{"vue":"node_modules/vue/dist/vue.common.js","vue-router":"node_modules/vue-router/dist/vue-router.esm.js","vuetify":"node_modules/vuetify/dist/vuetify.js","vuetify/dist/vuetify.min.css":"node_modules/vuetify/dist/vuetify.min.css","./app/App":"app/App.vue","./app/views/Intro":"app/views/Intro.vue","./app/views/Grid":"app/views/Grid.vue"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -39526,7 +39538,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51738" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61780" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

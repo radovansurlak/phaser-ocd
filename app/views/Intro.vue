@@ -28,7 +28,7 @@
 								Play Ferry Game
 							</v-btn>
 							<v-spacer></v-spacer>
-							<v-btn large :disabled="!formFilled" @click="playGame('grid')"> 
+							<v-btn large :disabled="!formFilled || gridTestDone" @click="playGame('grid')"> 
 								Play Grid Game
 							</v-btn>
 						</v-card-actions>
@@ -75,11 +75,14 @@ export default {
 	computed: {
 		formFilled() {
 			return this.dataConsent && this.$refs.form.validate();
+		},
+		gridTestDone() {
+			return localStorage.getItem('gridTestDone') === 'true' || false;
 		}
 	},
 	methods: {
 		playGame(game) {
-			this.$root.userData = this.userSelection;
+			localStorage.setItem('userData', JSON.stringify(this.userSelection));
 			this.$router.push(game);
 		}
 	}

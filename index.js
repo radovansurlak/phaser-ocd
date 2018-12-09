@@ -25,11 +25,8 @@ const router = new VueRouter({
 new Vue({
 	el: '#app',
 	router,
-	data: {
-		userData: {},
-	},
+	components: { App },
 	template: '<App/>',
-	components: { App }
 })
 
 
