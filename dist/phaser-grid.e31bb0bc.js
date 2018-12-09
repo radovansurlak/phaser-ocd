@@ -37545,7 +37545,7 @@ var _default = {
 
     if (!this.occupied && !sprite.moved) {
       // Not occupied AND initial movement, therefore occupy location
-      this.gridMatrix[coord.y][coord.x] = 1; // occupy location
+      this.gridMatrix[coord.y][coord.x] = sprite.id; // occupy location
 
       sprite.moved = true; // mark circle as moved
 
@@ -37561,7 +37561,7 @@ var _default = {
       // Clear previous location first (IMPORTANT, if up and down movement)
       this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = 0; //reset old location
 
-      this.gridMatrix[coord.y][coord.x] = 1; // occupy location (either same or new)
+      this.gridMatrix[coord.y][coord.x] = sprite.id; // occupy location (either same or new)
 
       this.snapToGrid(sprite);
       sprite.frame = 1; // change to blue colour, resting state
@@ -37578,7 +37578,7 @@ var _default = {
       sprite.x = this.tempXY.x;
       sprite.y = this.tempXY.y;
       this.snapToGrid(sprite);
-      this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = 1; // occupy location (either same or new)
+      this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = sprite.id; // occupy location (either same or new)
 
       sprite.frame = 1; // change to blue colour, resting state
 
@@ -37606,6 +37606,7 @@ var _default = {
 
     this.result = 'dropped ' + sprite.key + sprite.position;
     this.result = sprite.key + " dropped at x:" + sprite.x + " y: " + sprite.y;
+    console.log("The grid matrix now: ".concat(this.seeGrid()));
   },
   getCoord: function getCoord(sprite) {
     // find the coordinates of the sprite, as we now know the coordinates are within the frame
@@ -37649,7 +37650,9 @@ var _default = {
       for (var j = 0; j < this.NUM_COLS; j++) {
         gridString += ' ' + this.gridMatrix[i][j];
       }
-    } // const headers = {
+    }
+
+    return gridString; // const headers = {
     // 	'Access-Control-Allow-Origin': '*',
     // 	'Content-Type': 'application/json',
     // }
@@ -37662,7 +37665,6 @@ var _default = {
     // 			console.log(res);
     // 		})
     // }
-
   },
   snapToGrid: function snapToGrid(sprite) {
     for (var i = 0; i < this.rect.length; i++) {

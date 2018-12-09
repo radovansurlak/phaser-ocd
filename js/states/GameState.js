@@ -205,7 +205,7 @@ export default {
 
 		if (!this.occupied && !sprite.moved) {
 			// Not occupied AND initial movement, therefore occupy location
-			this.gridMatrix[coord.y][coord.x] = 1; // occupy location
+			this.gridMatrix[coord.y][coord.x] = sprite.id; // occupy location
 			sprite.moved = true; // mark circle as moved
 			this.refreshStats(-1); // reduce counter as this is initial movement of circle
 			this.snapToGrid(sprite); // snap to grid
@@ -216,7 +216,7 @@ export default {
 			// Not occupied AND subsequent move (new location OR just up and down movement, i.e. same location)
 			// Clear previous location first (IMPORTANT, if up and down movement)
 			this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = 0; //reset old location
-			this.gridMatrix[coord.y][coord.x] = 1; // occupy location (either same or new)
+			this.gridMatrix[coord.y][coord.x] = sprite.id; // occupy location (either same or new)
 			this.snapToGrid(sprite);
 			sprite.frame = 1; // change to blue colour, resting state
 			console.log('Not OCC - later Move');
@@ -233,7 +233,7 @@ export default {
 			sprite.x = this.tempXY.x;
 			sprite.y = this.tempXY.y;
 			this.snapToGrid(sprite);
-			this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = 1; // occupy location (either same or new)
+			this.gridMatrix[this.tempCoord.y][this.tempCoord.x] = sprite.id; // occupy location (either same or new)
 			sprite.frame = 1; // change to blue colour, resting state
 			console.log(' OCC - later Move');
 		}
@@ -258,6 +258,8 @@ export default {
 
 		this.result = 'dropped ' + sprite.key + sprite.position;
 		this.result = sprite.key + " dropped at x:" + sprite.x + " y: " + sprite.y;
+
+		console.log(`The grid matrix now: ${this.seeGrid()}`);
 	},
 
 	getCoord: function (sprite) {
@@ -302,6 +304,7 @@ export default {
 				gridString += ' ' + this.gridMatrix[i][j];
 			}
 		}
+		return gridString;
 		// const headers = {
 		// 	'Access-Control-Allow-Origin': '*',
 		// 	'Content-Type': 'application/json',
