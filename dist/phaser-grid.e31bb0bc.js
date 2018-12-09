@@ -37358,8 +37358,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //this game will have only 1 state
 var _default = {
+  spriteIdCounter: 1,
+  dots: [],
+  // dots: [
+  // 	{
+  // 		positions: [
+  // 			{
+  // 				x: '',
+  // 				y: '',
+  // 				timeStart: '',
+  // 				timeEnd: '',
+  // 				duration: ''
+  // 			}
+  // 		]
+  // 	}
+  // ],
   //executed after everything is loaded
   create: function create() {
     // Let's set a number of constants, so they can be changed later
@@ -37483,6 +37503,22 @@ var _default = {
   onDragStop: function onDragStop(sprite) {
     console.log(this.circle.input.pointerDragged());
     console.log('dragStop event...');
+    var coord = this.getCoord(sprite); // debug
+
+    console.log(coord);
+
+    if (sprite.id) {
+      console.log("Id: ".concat(sprite.id));
+      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord));
+      console.log(this.dots);
+    } else {
+      sprite.id = this.spriteIdCounter++;
+      this.dots.push({
+        positions: []
+      });
+      this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord));
+      console.log(this.dots);
+    }
     /*
     // First, we check for overlap with the whole grid frame and reset circle if out of bounds
     if (!Phaser.Rectangle.intersects(sprite.getBounds(), this.frame)) {
@@ -37493,9 +37529,7 @@ var _default = {
     */
     // Second, we find the coordinates of the current location (within the frame)
 
-    var coord = this.getCoord(sprite); // debug
 
-    console.log(coord);
     this.seeGrid(); // Third, we check if this is the location is occupied
 
     this.occupied = this.gridMatrix[coord.y][coord.x] === 1;
@@ -37606,21 +37640,20 @@ var _default = {
       for (var j = 0; j < this.NUM_COLS; j++) {
         gridString += ' ' + this.gridMatrix[i][j];
       }
-    }
+    } // const headers = {
+    // 	'Access-Control-Allow-Origin': '*',
+    // 	'Content-Type': 'application/json',
+    // }
+    // if (!this.circlesLeft) {
+    // 	const data = JSON.stringify(this.gridMatrix);
+    // 	console.log('sending results');
+    // 	axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
+    // 		.then((res, err) => {
+    // 			if (err) return console.error(err);
+    // 			console.log(res);
+    // 		})
+    // }
 
-    var headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json' // if (!this.circlesLeft) {
-      // 	const data = JSON.stringify(this.gridMatrix);
-      // 	console.log('sending results');
-      // 	axios.post('http://127.0.0.1:3000/result', data, { headers: headers })
-      // 		.then((res, err) => {
-      // 			if (err) return console.error(err);
-      // 			console.log(res);
-      // 		})
-      // }
-
-    };
   },
   snapToGrid: function snapToGrid(sprite) {
     for (var i = 0; i < this.rect.length; i++) {
@@ -37634,17 +37667,13 @@ var _default = {
   justAClick: function justAClick(sprite) {
     var distanceFromLastUp = Phaser.Math.distance(this.game.input.activePointer.positionDown.x, this.game.input.activePointer.positionDown.y, this.game.input.activePointer.x, this.game.input.activePointer.y);
     return distanceFromLastUp != 0;
-  }
-  /*
-  // Debugging...
-  render: function () {
-  		// input some debug info on the screen
-  		game.debug.inputInfo(400, 200, '#000');
-  		game.debug.text(this.result, 10, 20, '#000');
-  		game.debug.timer(this.result, 400, 300, '#000');
-  		game.debug.rectangle(this.frame, '#ffff00', false);
-  	}
-  */
+  } // render: function () {
+  // 	// input some debug info on the screen
+  // 	this.game.debug.inputInfo(400, 200, '#000');
+  // 	this.game.debug.text(this.result, 10, 20, '#000');
+  // 	this.game.debug.timer(this.result, 400, 300, '#000');
+  // 	this.game.debug.rectangle(this.frame, '#ffff00', false);
+  // }
 
 };
 exports.default = _default;
@@ -37673,7 +37702,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 var _default = {
-  name: "Grid game",
+  name: "GridGame",
   mounted: function mounted() {
     var game = new Phaser.Game(640, 360, Phaser.AUTO); //var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea');
 

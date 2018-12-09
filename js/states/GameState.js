@@ -1,6 +1,23 @@
 //this game will have only 1 state
 export default {
 
+	spriteIdCounter: 1,
+	dots: [],
+
+	// dots: [
+	// 	{
+	// 		positions: [
+	// 			{
+	// 				x: '',
+	// 				y: '',
+	// 				timeStart: '',
+	// 				timeEnd: '',
+	// 				duration: ''
+	// 			}
+	// 		]
+	// 	}
+	// ],
+
 	//executed after everything is loaded
 	create: function () {
 
@@ -131,6 +148,22 @@ export default {
 	onDragStop: function (sprite) {
 		console.log(this.circle.input.pointerDragged());
 		console.log('dragStop event...')
+		var coord = this.getCoord(sprite);
+		// debug
+		console.log(coord);
+	
+		if (sprite.id) {
+			console.log(`Id: ${sprite.id}`)
+			this.dots[sprite.id - 1].positions.push({...coord})
+			console.log(this.dots);
+		} else {
+			sprite.id = this.spriteIdCounter++;
+			this.dots.push({
+				positions: [],
+			})
+			this.dots[sprite.id - 1].positions.push({...coord})
+			console.log(this.dots);
+		}
 		/*
 		// First, we check for overlap with the whole grid frame and reset circle if out of bounds
 		if (!Phaser.Rectangle.intersects(sprite.getBounds(), this.frame)) {
@@ -140,9 +173,7 @@ export default {
 		}
 		*/
 		// Second, we find the coordinates of the current location (within the frame)
-		var coord = this.getCoord(sprite);
-		// debug
-		console.log(coord);
+		
 		this.seeGrid();
 
 		// Third, we check if this is the location is occupied
@@ -247,10 +278,10 @@ export default {
 				gridString += ' ' + this.gridMatrix[i][j];
 			}
 		}
-		const headers = {
-			'Access-Control-Allow-Origin': '*',
-			'Content-Type': 'application/json',
-		}
+		// const headers = {
+		// 	'Access-Control-Allow-Origin': '*',
+		// 	'Content-Type': 'application/json',
+		// }
 		// if (!this.circlesLeft) {
 		// 	const data = JSON.stringify(this.gridMatrix);
 		// 	console.log('sending results');
@@ -275,15 +306,11 @@ export default {
 			this.game.input.activePointer.positionDown.y, this.game.input.activePointer.x, this.game.input.activePointer.y);
 		return distanceFromLastUp != 0;
 	},
-	/*
-	// Debugging...
-	render: function () {
-			// input some debug info on the screen
-			game.debug.inputInfo(400, 200, '#000');
-			game.debug.text(this.result, 10, 20, '#000');
-			game.debug.timer(this.result, 400, 300, '#000');
-			game.debug.rectangle(this.frame, '#ffff00', false);
-
-	}
-*/
+	// render: function () {
+	// 	// input some debug info on the screen
+	// 	this.game.debug.inputInfo(400, 200, '#000');
+	// 	this.game.debug.text(this.result, 10, 20, '#000');
+	// 	this.game.debug.timer(this.result, 400, 300, '#000');
+	// 	this.game.debug.rectangle(this.frame, '#ffff00', false);
+	// }
 };

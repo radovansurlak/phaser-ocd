@@ -11,7 +11,7 @@ import PreloadState from "../../js/states/PreloadState.js";
 import GameState from "../../js/states/GameState.js";
 
 export default {
-  name: "Grid game",
+  name: "GridGame",
   mounted() {
     let game = new Phaser.Game(640, 360, Phaser.AUTO);
     //var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea');
