@@ -6,48 +6,31 @@ import 'vuetify/dist/vuetify.min.css'
 Vue.use(Vuetify)
 Vue.use(VueRouter)
 
+import App from './app/App'
+import Intro from './app/views/Intro'
+
+
 const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
 
 const router = new VueRouter({
 	routes: [
-		{ path: '/foo', component: Foo },
+		{ path: '/', component: Intro },
 		{ path: '/bar', component: Bar }
 	],
 }
 )
 
 new Vue({
+	el: '#app',
 	router,
-	data: () => ({
-		title: 'OCD Step 1',
-		validationRules: {
-			age: [
-				value => !!value || 'Your age is required'
-			],
-			educationLevel: [
-				value => !!value || 'Your education level is required'
-			],
-		},
-		options: {
-			ageGroup: ["10 - 15", "16 - 20", "21 - 30", "31 - 45"],
-			educationLevel: [
-				"Primary education",
-				"Secondary education",
-				"Higher education",
-			]
-		},
-		userSelection: {
-			ageGroup: '',
-			educationLevel: ''
-		},
-		dataConsent: false,
-		dataConsentText: 'I agree to submit my anonymous data for academic research'
-	}),
-	computed: {
-		formFilled() {
-			return this.dataConsent && this.$refs.form.validate();
-		}
-	},
-}).$mount('#app');
+	template: '<App/>',
+	components: { App }
+})
+
+
+
+
+
+
 

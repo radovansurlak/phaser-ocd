@@ -7,45 +7,17 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
 	<title>The Grid Task</title>
 <link rel="stylesheet" href="/phaser-grid.e31bb0bc.css"></head>
+<style>#app {
+		background: #2980B9;
+		/* fallback for old browsers */
+		background: -webkit-linear-gradient(to right, #FFFFFF, #6DD5FA, #2980B9);
+		/* Chrome 10-25, Safari 5.1-6 */
+		background: linear-gradient(to right, #FFFFFF, #6DD5FA, #2980B9);
+		/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	}</style>
 
 <body>
 	<div id="app">
-		<v-app>
-			<v-content>
-				<v-container fluid="" fill-height="">
-					<v-layout align-center="" justify-center="">
-						<v-card>
-							<v-toolbar dark="" color="primary">
-								<v-toolbar-title>{{ title }}</v-toolbar-title>
-							</v-toolbar>
-							<v-card-text>
-								<v-form ref="form">
-									<v-select v-model="userSelection.ageGroup" :items="options.ageGroup" :rules="validationRules.age" label="Your age" required=""></v-select>
-									<v-select v-model="userSelection.educationLevel" :items="options.educationLevel" :rules="validationRules.educationLevel" label="Your education level" required=""></v-select>
-									<v-checkbox v-model="dataConsent" :label="dataConsentText" required=""></v-checkbox>
-							</v-form></v-card-text>
-							<router-link to="/foo">Go to Foo</router-link>
-							<router-link to="/bar">Go to Bar</router-link>
-							<v-card-actions>
-
-								<v-btn large="" :disabled="!formFilled" @click="submit">
-									Play Ferry Game
-								</v-btn>
-								<v-spacer></v-spacer>
-								<v-btn large="" :disabled="!formFilled" @click="submit">
-									Play Grid Game
-								</v-btn>
-							</v-card-actions>
-
-							
-
-					</v-card></v-layout>
-				</v-container>
-			</v-content>
-		</v-app>
-		<router-view>
-
-		</router-view>
 	</div>
 </body>
 

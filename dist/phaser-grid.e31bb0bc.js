@@ -36642,40 +36642,294 @@ module.exports = reloadCSS;
         module.hot.dispose(reloadCSS);
         module.hot.accept(reloadCSS);
       
-},{"_css_loader":"node_modules/parcel-bundler/src/builtins/css-loader.js"}],"index.js":[function(require,module,exports) {
+},{"_css_loader":"node_modules/parcel-bundler/src/builtins/css-loader.js"}],"node_modules/vue-hot-reload-api/dist/index.js":[function(require,module,exports) {
+var Vue // late bind
+var version
+var map = Object.create(null)
+if (typeof window !== 'undefined') {
+  window.__VUE_HOT_MAP__ = map
+}
+var installed = false
+var isBrowserify = false
+var initHookName = 'beforeCreate'
+
+exports.install = function (vue, browserify) {
+  if (installed) { return }
+  installed = true
+
+  Vue = vue.__esModule ? vue.default : vue
+  version = Vue.version.split('.').map(Number)
+  isBrowserify = browserify
+
+  // compat with < 2.0.0-alpha.7
+  if (Vue.config._lifecycleHooks.indexOf('init') > -1) {
+    initHookName = 'init'
+  }
+
+  exports.compatible = version[0] >= 2
+  if (!exports.compatible) {
+    console.warn(
+      '[HMR] You are using a version of vue-hot-reload-api that is ' +
+        'only compatible with Vue.js core ^2.0.0.'
+    )
+    return
+  }
+}
+
+/**
+ * Create a record for a hot module, which keeps track of its constructor
+ * and instances
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+exports.createRecord = function (id, options) {
+  if(map[id]) { return }
+
+  var Ctor = null
+  if (typeof options === 'function') {
+    Ctor = options
+    options = Ctor.options
+  }
+  makeOptionsHot(id, options)
+  map[id] = {
+    Ctor: Ctor,
+    options: options,
+    instances: []
+  }
+}
+
+/**
+ * Check if module is recorded
+ *
+ * @param {String} id
+ */
+
+exports.isRecorded = function (id) {
+  return typeof map[id] !== 'undefined'
+}
+
+/**
+ * Make a Component options object hot.
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+function makeOptionsHot(id, options) {
+  if (options.functional) {
+    var render = options.render
+    options.render = function (h, ctx) {
+      var instances = map[id].instances
+      if (ctx && instances.indexOf(ctx.parent) < 0) {
+        instances.push(ctx.parent)
+      }
+      return render(h, ctx)
+    }
+  } else {
+    injectHook(options, initHookName, function() {
+      var record = map[id]
+      if (!record.Ctor) {
+        record.Ctor = this.constructor
+      }
+      record.instances.push(this)
+    })
+    injectHook(options, 'beforeDestroy', function() {
+      var instances = map[id].instances
+      instances.splice(instances.indexOf(this), 1)
+    })
+  }
+}
+
+/**
+ * Inject a hook to a hot reloadable component so that
+ * we can keep track of it.
+ *
+ * @param {Object} options
+ * @param {String} name
+ * @param {Function} hook
+ */
+
+function injectHook(options, name, hook) {
+  var existing = options[name]
+  options[name] = existing
+    ? Array.isArray(existing) ? existing.concat(hook) : [existing, hook]
+    : [hook]
+}
+
+function tryWrap(fn) {
+  return function (id, arg) {
+    try {
+      fn(id, arg)
+    } catch (e) {
+      console.error(e)
+      console.warn(
+        'Something went wrong during Vue component hot-reload. Full reload required.'
+      )
+    }
+  }
+}
+
+function updateOptions (oldOptions, newOptions) {
+  for (var key in oldOptions) {
+    if (!(key in newOptions)) {
+      delete oldOptions[key]
+    }
+  }
+  for (var key$1 in newOptions) {
+    oldOptions[key$1] = newOptions[key$1]
+  }
+}
+
+exports.rerender = tryWrap(function (id, options) {
+  var record = map[id]
+  if (!options) {
+    record.instances.slice().forEach(function (instance) {
+      instance.$forceUpdate()
+    })
+    return
+  }
+  if (typeof options === 'function') {
+    options = options.options
+  }
+  if (record.Ctor) {
+    record.Ctor.options.render = options.render
+    record.Ctor.options.staticRenderFns = options.staticRenderFns
+    record.instances.slice().forEach(function (instance) {
+      instance.$options.render = options.render
+      instance.$options.staticRenderFns = options.staticRenderFns
+      // reset static trees
+      // pre 2.5, all static trees are cached together on the instance
+      if (instance._staticTrees) {
+        instance._staticTrees = []
+      }
+      // 2.5.0
+      if (Array.isArray(record.Ctor.options.cached)) {
+        record.Ctor.options.cached = []
+      }
+      // 2.5.3
+      if (Array.isArray(instance.$options.cached)) {
+        instance.$options.cached = []
+      }
+      // post 2.5.4: v-once trees are cached on instance._staticTrees.
+      // Pure static trees are cached on the staticRenderFns array
+      // (both already reset above)
+      instance.$forceUpdate()
+    })
+  } else {
+    // functional or no instance created yet
+    record.options.render = options.render
+    record.options.staticRenderFns = options.staticRenderFns
+
+    // handle functional component re-render
+    if (record.options.functional) {
+      // rerender with full options
+      if (Object.keys(options).length > 2) {
+        updateOptions(record.options, options)
+      } else {
+        // template-only rerender.
+        // need to inject the style injection code for CSS modules
+        // to work properly.
+        var injectStyles = record.options._injectStyles
+        if (injectStyles) {
+          var render = options.render
+          record.options.render = function (h, ctx) {
+            injectStyles.call(ctx)
+            return render(h, ctx)
+          }
+        }
+      }
+      record.options._Ctor = null
+      // 2.5.3
+      if (Array.isArray(record.options.cached)) {
+        record.options.cached = []
+      }
+      record.instances.slice().forEach(function (instance) {
+        instance.$forceUpdate()
+      })
+    }
+  }
+})
+
+exports.reload = tryWrap(function (id, options) {
+  var record = map[id]
+  if (options) {
+    if (typeof options === 'function') {
+      options = options.options
+    }
+    makeOptionsHot(id, options)
+    if (record.Ctor) {
+      if (version[1] < 2) {
+        // preserve pre 2.2 behavior for global mixin handling
+        record.Ctor.extendOptions = options
+      }
+      var newCtor = record.Ctor.super.extend(options)
+      record.Ctor.options = newCtor.options
+      record.Ctor.cid = newCtor.cid
+      record.Ctor.prototype = newCtor.prototype
+      if (newCtor.release) {
+        // temporary global mixin strategy used in < 2.0.0-alpha.6
+        newCtor.release()
+      }
+    } else {
+      updateOptions(record.options, options)
+    }
+  }
+  record.instances.slice().forEach(function (instance) {
+    if (instance.$vnode && instance.$vnode.context) {
+      instance.$vnode.context.$forceUpdate()
+    } else {
+      console.warn(
+        'Root or manually mounted instance modified. Full reload required.'
+      )
+    }
+  })
+})
+
+},{}],"app/views/Intro.vue":[function(require,module,exports) {
 "use strict";
 
-var _vue = _interopRequireDefault(require("vue"));
-
-var _vueRouter = _interopRequireDefault(require("vue-router"));
-
-var _vuetify = _interopRequireDefault(require("vuetify"));
-
-require("vuetify/dist/vuetify.min.css");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_vue.default.use(_vuetify.default);
-
-_vue.default.use(_vueRouter.default);
-
-var Foo = {
-  template: '<div>foo</div>'
-};
-var Bar = {
-  template: '<div>bar</div>'
-};
-var router = new _vueRouter.default({
-  routes: [{
-    path: '/foo',
-    component: Foo
-  }, {
-    path: '/bar',
-    component: Bar
-  }]
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
-new _vue.default({
-  router: router,
+exports.default = void 0;
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var _default = {
   data: function data() {
     return {
       title: 'OCD Step 1',
@@ -36704,8 +36958,303 @@ new _vue.default({
       return this.dataConsent && this.$refs.form.validate();
     }
   }
-}).$mount('#app');
-},{"vue":"node_modules/vue/dist/vue.common.js","vue-router":"node_modules/vue-router/dist/vue-router.esm.js","vuetify":"node_modules/vuetify/dist/vuetify.js","vuetify/dist/vuetify.min.css":"node_modules/vuetify/dist/vuetify.min.css"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+};
+exports.default = _default;
+        var $4329ea = exports.default || module.exports;
+      
+      if (typeof $4329ea === 'function') {
+        $4329ea = $4329ea.options;
+      }
+    
+        /* template */
+        Object.assign($4329ea, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "v-app",
+    [
+      _c(
+        "v-content",
+        [
+          _c(
+            "v-container",
+            { attrs: { fluid: "", "fill-height": "" } },
+            [
+              _c(
+                "v-layout",
+                { attrs: { "align-center": "", "justify-center": "" } },
+                [
+                  _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-toolbar",
+                        { attrs: { dark: "", color: "primary" } },
+                        [_c("v-toolbar-title", [_vm._v(_vm._s(_vm.title))])],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-text",
+                        [
+                          _c(
+                            "v-form",
+                            { ref: "form" },
+                            [
+                              _c("v-select", {
+                                attrs: {
+                                  items: _vm.options.ageGroup,
+                                  rules: _vm.validationRules.age,
+                                  label: "Your age",
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.userSelection.ageGroup,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.userSelection, "ageGroup", $$v)
+                                  },
+                                  expression: "userSelection.ageGroup"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("v-select", {
+                                attrs: {
+                                  items: _vm.options.educationLevel,
+                                  rules: _vm.validationRules.educationLevel,
+                                  label: "Your education level",
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.userSelection.educationLevel,
+                                  callback: function($$v) {
+                                    _vm.$set(
+                                      _vm.userSelection,
+                                      "educationLevel",
+                                      $$v
+                                    )
+                                  },
+                                  expression: "userSelection.educationLevel"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("v-checkbox", {
+                                attrs: {
+                                  label: _vm.dataConsentText,
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.dataConsent,
+                                  callback: function($$v) {
+                                    _vm.dataConsent = $$v
+                                  },
+                                  expression: "dataConsent"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("router-link", { attrs: { to: "/foo" } }, [
+                        _vm._v("Go to Foo")
+                      ]),
+                      _vm._v(" "),
+                      _c("router-link", { attrs: { to: "/bar" } }, [
+                        _vm._v("Go to Bar")
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { large: "", disabled: !_vm.formFilled },
+                              on: { click: _vm.submit }
+                            },
+                            [
+                              _vm._v(
+                                "\n\t\t\t\t\t\t\t\tPlay Ferry Game\n\t\t\t\t\t\t\t"
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c("v-spacer"),
+                          _vm._v(" "),
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { large: "", disabled: !_vm.formFilled },
+                              on: { click: _vm.submit }
+                            },
+                            [
+                              _vm._v(
+                                "\n\t\t\t\t\t\t\t\tPlay Grid Game\n\t\t\t\t\t\t\t"
+                              )
+                            ]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$4329ea', $4329ea);
+          } else {
+            api.reload('$4329ea', $4329ea);
+          }
+        }
+
+        
+      }
+    })();
+},{"vue-hot-reload-api":"node_modules/vue-hot-reload-api/dist/index.js","vue":"node_modules/vue/dist/vue.common.js"}],"app/App.vue":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _Intro = _interopRequireDefault(require("./views/Intro"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+var _default = {
+  components: {
+    Intro: _Intro.default
+  }
+};
+exports.default = _default;
+        var $3d1aaf = exports.default || module.exports;
+      
+      if (typeof $3d1aaf === 'function') {
+        $3d1aaf = $3d1aaf.options;
+      }
+    
+        /* template */
+        Object.assign($3d1aaf, (function () {
+          var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("router-view")
+}
+var staticRenderFns = []
+render._withStripped = true
+
+          return {
+            render: render,
+            staticRenderFns: staticRenderFns,
+            _compiled: true,
+            _scopeId: null,
+            functional: undefined
+          };
+        })());
+      
+    /* hot reload */
+    (function () {
+      if (module.hot) {
+        var api = require('vue-hot-reload-api');
+        api.install(require('vue'));
+        if (api.compatible) {
+          module.hot.accept();
+          if (!module.hot.data) {
+            api.createRecord('$3d1aaf', $3d1aaf);
+          } else {
+            api.reload('$3d1aaf', $3d1aaf);
+          }
+        }
+
+        
+      }
+    })();
+},{"./views/Intro":"app/views/Intro.vue","vue-hot-reload-api":"node_modules/vue-hot-reload-api/dist/index.js","vue":"node_modules/vue/dist/vue.common.js"}],"index.js":[function(require,module,exports) {
+"use strict";
+
+var _vue = _interopRequireDefault(require("vue"));
+
+var _vueRouter = _interopRequireDefault(require("vue-router"));
+
+var _vuetify = _interopRequireDefault(require("vuetify"));
+
+require("vuetify/dist/vuetify.min.css");
+
+var _App = _interopRequireDefault(require("./app/App"));
+
+var _Intro = _interopRequireDefault(require("./app/views/Intro"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_vue.default.use(_vuetify.default);
+
+_vue.default.use(_vueRouter.default);
+
+var Foo = {
+  template: '<div>foo</div>'
+};
+var Bar = {
+  template: '<div>bar</div>'
+};
+var router = new _vueRouter.default({
+  routes: [{
+    path: '/',
+    component: _Intro.default
+  }, {
+    path: '/bar',
+    component: Bar
+  }]
+});
+new _vue.default({
+  el: '#app',
+  router: router,
+  template: '<App/>',
+  components: {
+    App: _App.default
+  }
+});
+},{"vue":"node_modules/vue/dist/vue.common.js","vue-router":"node_modules/vue-router/dist/vue-router.esm.js","vuetify":"node_modules/vuetify/dist/vuetify.js","vuetify/dist/vuetify.min.css":"node_modules/vuetify/dist/vuetify.min.css","./app/App":"app/App.vue","./app/views/Intro":"app/views/Intro.vue"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
