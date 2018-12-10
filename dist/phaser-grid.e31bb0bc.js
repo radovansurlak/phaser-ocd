@@ -39098,6 +39098,12 @@ var _default = {
     this.result = '';
   },
   onDoneButtonClick: function onDoneButtonClick() {
+    if (localStorage.getItem('gridTestDone') === 'true') {
+      alert('You have already taken this test, you cannot submit your results more than once');
+      window.location.replace("/");
+      return;
+    }
+
     if (!!this.circlesLeft) {
       alert('You have to place all the remaining circles on the grid');
       return;
@@ -39107,17 +39113,24 @@ var _default = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json'
     };
+    var gameEndTimestamp = +new Date();
+    var gameDuration = {
+      gameStartTimestamp: this.gameStartTimestamp,
+      gameEndTimestamp: gameEndTimestamp,
+      gameDurationInMs: gameEndTimestamp - this.gameStartTimestamp
+    };
     var userData = JSON.parse(localStorage.getItem('userData'));
     var data = {
       matrix: this.gridMatrix,
       dots: this.dots,
+      gameDuration: gameDuration,
       userData: userData
     };
     var JSONData = JSON.stringify(data);
     console.log(JSON.parse(JSONData));
     console.log('sending results');
 
-    _axios.default.post('http://127.0.0.1:3000/result', JSONData, {
+    _axios.default.post('https://ocd-node.herokuapp.com/result', JSONData, {
       headers: headers
     }).then(function (res, err) {
       if (err) return console.error(err);
@@ -39219,16 +39232,13 @@ var _default = {
     console.log(coord);
 
     if (sprite.id) {
-      console.log("Id: ".concat(sprite.id));
       this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord, this.handleTimeData(sprite)));
-      console.log(this.dots);
     } else {
       sprite.id = this.spriteIdCounter++;
       this.dots.push({
         positions: []
       });
       this.dots[sprite.id - 1].positions.push(_objectSpread({}, coord, this.handleTimeData(sprite)));
-      console.log(this.dots);
     }
     /*
     // First, we check for overlap with the whole grid frame and reset circle if out of bounds
@@ -39243,7 +39253,7 @@ var _default = {
 
     this.seeGrid(); // Third, we check if this is the location is occupied
 
-    this.occupied = this.gridMatrix[coord.y][coord.x] === 1;
+    this.occupied = this.gridMatrix[coord.y][coord.x] !== 0;
 
     if (!this.occupied && !sprite.moved) {
       // Not occupied AND initial movement, therefore occupy location
@@ -39538,7 +39548,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61780" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50077" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

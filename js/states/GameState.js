@@ -74,6 +74,11 @@ export default {
 	},
 
 	onDoneButtonClick() {
+		if (localStorage.getItem('gridTestDone') === 'true') {
+			alert('You have already taken this test, you cannot submit your results more than once');
+			window.location.replace("/");
+			return;
+		}
 		if (!!this.circlesLeft) {
 			alert('You have to place all the remaining circles on the grid');
 			return;
@@ -84,11 +89,20 @@ export default {
 			'Content-Type': 'application/json',
 		}
 
+		let gameEndTimestamp = + new Date();
+
+		let gameDuration = {
+			gameStartTimestamp: this.gameStartTimestamp,
+			gameEndTimestamp,
+			gameDurationInMs: gameEndTimestamp - this.gameStartTimestamp,
+		}
+
 		let userData = JSON.parse(localStorage.getItem('userData'));
 
 		let data = {
 			matrix: this.gridMatrix,
 			dots: this.dots,
+			gameDuration,
 			userData,
 		};
 
@@ -97,7 +111,7 @@ export default {
 		console.log(JSON.parse(JSONData));
 		console.log('sending results');
 
-		axios.post('http://127.0.0.1:3000/result', JSONData, { headers: headers })
+		axios.post('https://ocd-node.herokuapp.com/result', JSONData, { headers: headers })
 			.then((res, err) => {
 				if (err) return console.error(err);
 				console.log(res);
@@ -208,17 +222,15 @@ export default {
 
 		sprite.dragEndTime = + new Date();
 
-		let coord = this.getCoord(sprite);
+		var coord = this.getCoord(sprite);
 		// debug
 		console.log(coord);
 
 		if (sprite.id) {
-			console.log(`Id: ${sprite.id}`)
 			this.dots[sprite.id - 1].positions.push({
 				...coord,
 				...this.handleTimeData(sprite)
 			})
-			console.log(this.dots);
 		} else {
 			sprite.id = this.spriteIdCounter++;
 			this.dots.push({
@@ -228,7 +240,6 @@ export default {
 				...coord,
 				...this.handleTimeData(sprite)
 			})
-			console.log(this.dots);
 		}
 
 
@@ -246,7 +257,7 @@ export default {
 		this.seeGrid();
 
 		// Third, we check if this is the location is occupied
-		this.occupied = this.gridMatrix[coord.y][coord.x] === 1;
+		this.occupied = this.gridMatrix[coord.y][coord.x] !== 0;
 
 		if (!this.occupied && !sprite.moved) {
 			// Not occupied AND initial movement, therefore occupy location
