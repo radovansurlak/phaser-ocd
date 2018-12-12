@@ -133,12 +133,10 @@ export default {
 		axios.post('https://ocd-node.herokuapp.com/result', JSONData, { headers: headers })
 			.then((res, err) => {
 				if (err) return console.error(err);
-				
 				localStorage.setItem('gridTestDone', true);
 				this.redirectHome();
 				return;
 			})
-
 	},
 
 	update: function () {
