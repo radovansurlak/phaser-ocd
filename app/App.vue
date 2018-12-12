@@ -42,8 +42,27 @@
 	</main>
 </template>
 
-<script>
+<style lang="scss">
+	 @media screen and (max-width: 450px) {
+		.v-card__actions {
+			flex-wrap: wrap;
+			justify-content: center;
+			.spacer {
+				display: none;
+			}
+			button	{
+				width: 100%;
+				margin-left: 0;
+				margin-right: 0;
+			}
+			.v-btn ~ .v-btn {
+				margin-top: 17px;
+			}
+		}
+	 }
+</style>
 
+<script>
 export default {
 	name: 'App',
 	data: () => ({
@@ -88,7 +107,6 @@ export default {
     $route (to, from) {
 			if (from.path.match(/grid/)) {
 				this.testCompletion.gridTest = true
-				localStorage.setItem('gridTestDone', true);
 			}
     }
 	},
