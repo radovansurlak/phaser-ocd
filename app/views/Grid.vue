@@ -1,7 +1,5 @@
 <template>
-  <main>
-    <div id="gameArea"></div>
-  </main>
+	<main id="gameArea"></main>
 </template>
 
 <script>
@@ -15,11 +13,20 @@ export default {
   mounted() {
     let game = new Phaser.Game(640, 360, Phaser.AUTO);
     //var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea');
+		let boundRedirectHome = (function() {this.$router.push('/')}).bind(this)
+
     game.state.add("GameState", GameState);
     game.state.add("HomeState", HomeState);
     game.state.add("PreloadState", PreloadState);
     game.state.add("BootState", BootState);
-    game.state.start("BootState");
+		game.state.states.GameState.redirectHome = boundRedirectHome;
+		game.state.start("BootState");
+
+		// Redirect function that uses Vue's router to redirect user home 
+		// (we can keep user data filled out in the form this way + prevent browser refresh)
+
+		// Setting the redirect function as a method of the GameState object so we can
+		// call the redirect funciton from within the GameState object
   }
 };
 </script>

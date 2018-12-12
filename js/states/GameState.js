@@ -74,9 +74,10 @@ export default {
 	},
 
 	onDoneButtonClick() {
+		
 		if (localStorage.getItem('gridTestDone') === 'true') {
 			alert('You have already taken this test, you cannot submit your results more than once');
-			window.location.replace("/");
+			this.redirectHome();
 			return;
 		}
 		if (!!this.circlesLeft) {
@@ -114,11 +115,11 @@ export default {
 		axios.post('https://ocd-node.herokuapp.com/result', JSONData, { headers: headers })
 			.then((res, err) => {
 				if (err) return console.error(err);
-				console.log(res);
+				
 				localStorage.setItem('gridTestDone', true);
-				window.location.replace("/");
+				this.redirectHome();
+				return;
 			})
-
 
 	},
 

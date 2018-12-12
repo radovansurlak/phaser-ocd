@@ -7,13 +7,14 @@ Vue.use(Vuetify)
 Vue.use(VueRouter)
 
 import App from './app/App'
-import Intro from './app/views/Intro'
 import Grid from './app/views/Grid'
 
 const router = new VueRouter({
 	routes: [
-		{ path: '/', component: Intro },
-		{ path: '/grid', component: Grid }
+		{ 
+			path: '/grid', 
+			component: Grid,
+		}
 	],
 }
 )
