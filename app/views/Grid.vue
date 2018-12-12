@@ -1,8 +1,10 @@
 <template>
 	<main>
-		<div id="gameArea"></div>
 	</main>
 </template>
+
+<style lang="scss">
+</style>
 
 <script>
 import BootState from "../../js/states/BootState.js";

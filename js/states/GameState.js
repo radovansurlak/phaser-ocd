@@ -24,21 +24,24 @@ export default {
 	create: function () {
 
 		let windowWidth = document.body.getBoundingClientRect().width;
-		let viewportCenter = windowWidth / 2;
-		let isMobile = windowWidth < 450;
+		let isMobile = windowWidth < 500;
+
 
 		// Let's set a number of constants, so they can be changed later
 		this.NUM_ROWS = 13;
 		this.NUM_COLS = 13;
 		this.NUM_CIRCLES = 13;
-		this.BLOCK_SIZE = 40;
+		this.BLOCK_SIZE = isMobile ? 25 * window.devicePixelRatio : 40;
 		// this.BLOCK_SIZE = 20;
-		this.SCALE_CIRCLE = this.BLOCK_SIZE / 85 * 0.9;
+		this.SCALE_CIRCLE = this.BLOCK_SIZE / 85 * 0.8;
 		this.GRID_WIDTH = 1;
 		this.GRID_START_X = 40;
 		this.GRID_START_Y = 40;
 		this.GRID_END_X = this.NUM_COLS * this.BLOCK_SIZE;
 		this.GRID_END_Y = this.NUM_ROWS * this.BLOCK_SIZE;
+
+		let textAreaY = isMobile ? this.GRID_END_Y + 100 : 220;
+		let textAreaX = isMobile ? windowWidth : this.GRID_END_X + 100;
 
 		// create a Rectangle frame around grid (invisible)
 		this.frame = new Phaser.Rectangle(this.GRID_START_X, this.GRID_START_Y, this.GRID_END_X, this.GRID_END_Y);
@@ -57,14 +60,14 @@ export default {
 		// initialise circle counter
 		this.circlesLeft = this.NUM_CIRCLES;
 
-		var style = { font: '20px Roboto', fill: '#000' };
-		this.game.add.text(viewportCenter, 100, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
-		this.game.add.text(viewportCenter, 180, 'Circles left: ', style);
+		var style = { font: '25px Roboto', fill: '#000' };
+		this.game.add.text(textAreaX, textAreaY, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
+		this.game.add.text(textAreaX, textAreaY + 100, 'Circles left: ', style);
 
-		let button = this.game.add.button(viewportCenter - 15, 210, 'button', this.onDoneButtonClick, this, 2, 1, 0);
+		let button = this.game.add.button(textAreaX - 15, textAreaY + 160, 'button', this.onDoneButtonClick, this, 2, 1, 0);
 
-		style = { font: '25px Roboto', fill: '#0d50bc' };
-		this.circleScore = this.game.add.text(viewportCenter + 140, 176, '', style);
+		style = { font: '30px Roboto', fill: '#e67e22' };
+		this.circleScore = this.game.add.text(textAreaX + 130, textAreaY + 97, '', style);
 
 		this.refreshStats(0);
 
@@ -76,6 +79,7 @@ export default {
 
 		// debugging
 		this.result = '';
+
 	},
 
 	onDoneButtonClick() {
