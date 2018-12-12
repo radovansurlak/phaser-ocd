@@ -30,7 +30,7 @@
 										Play Ferry Game
 									</v-btn>
 									<v-spacer></v-spacer>
-									<v-btn large :disabled="!formFilled || gridTestDone" @click="playGame('grid')"> 
+									<v-btn large :disabled="!formFilled || testCompletion.gridTest" @click="playGame('grid')"> 
 										Play Grid Game
 									</v-btn>
 								</v-card-actions>
@@ -73,15 +73,28 @@ export default {
 			educationLevel: '',
 			gender: '',
 		},
+		testCompletion: {
+
+		},
 		dataConsent: false,
 		dataConsentText: 'I agree to submit my anonymous data for academic research'
 	}),
+	mounted() {
+		if (localStorage.gridTestDone) {
+			this.testCompletion.gridTest = true
+		}
+	},
+	watch:{
+    $route (to, from) {
+			if (from.path.match(/grid/)) {
+				this.testCompletion.gridTest = true
+				localStorage.setItem('gridTestDone', true);
+			}
+    }
+	},
 	computed: {
 		formFilled() {
 			return this.dataConsent && this.$refs.form.validate();
-		},
-		gridTestDone() {
-			return localStorage.getItem('gridTestDone') === 'true' || false;
 		},
 		isRootPage() {
 			return this.$route.path === '/'

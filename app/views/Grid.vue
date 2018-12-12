@@ -1,5 +1,7 @@
 <template>
-	<main id="gameArea"></main>
+	<main>
+		<div id="gameArea"></div>
+	</main>
 </template>
 
 <script>
@@ -11,9 +13,15 @@ import GameState from "../../js/states/GameState.js";
 export default {
   name: "GridGame",
   mounted() {
-    let game = new Phaser.Game(640, 360, Phaser.AUTO);
+    let game = new Phaser.Game({
+			width: 640,
+			height: 360,
+			renderer: Phaser.AUTO,
+			antialias: true,
+			parent: this.$el,
+		});
     //var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea');
-		let boundRedirectHome = (function() {this.$router.push('/')}).bind(this)
+		let boundRedirectHome = (function(testDone) {this.$router.push({ path: '/'})}).bind(this)
 
     game.state.add("GameState", GameState);
     game.state.add("HomeState", HomeState);
