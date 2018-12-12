@@ -40,8 +40,8 @@ export default {
 		this.GRID_END_X = this.NUM_COLS * this.BLOCK_SIZE;
 		this.GRID_END_Y = this.NUM_ROWS * this.BLOCK_SIZE;
 
-		let textAreaY = isMobile ? this.GRID_END_Y + this.GRID_START_Y + 100 : 220;
-		let textAreaX = isMobile ? windowWidth / 2 : this.GRID_START_X + this.GRID_END_X + 30;
+		this.textAreaY = isMobile ? this.GRID_END_Y + this.GRID_START_Y + 100 : 220;
+		this.textAreaX = isMobile ? windowWidth / 2 : this.GRID_START_X + this.GRID_END_X + 30;
 
 		// create a Rectangle frame around grid (invisible)
 		this.frame = new Phaser.Rectangle(this.GRID_START_X, this.GRID_START_Y, this.GRID_END_X, this.GRID_END_Y);
@@ -61,13 +61,20 @@ export default {
 		this.circlesLeft = this.NUM_CIRCLES;
 
 		var style = { font: '25px Roboto', fill: '#000' };
-		this.game.add.text(textAreaX, textAreaY, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
-		this.game.add.text(textAreaX, textAreaY + 100, 'Circles left: ', style);
+		this.game.add.text(this.textAreaX, this.textAreaY, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
+		this.game.add.text(this.textAreaX, this.textAreaY + 100, 'Circles left: ', style);
 
-		let button = this.game.add.button(textAreaX - 15, textAreaY + 160, 'button', this.onDoneButtonClick, this, 2, 1, 0);
+		this.doneButton = this.game.add.button(this.textAreaX - 15, this.textAreaY + 160, 'button', this.onDoneButtonClick, this, 2, 1, 0);
 
 		style = { font: '30px Roboto', fill: '#e67e22' };
-		this.circleScore = this.game.add.text(textAreaX + 130, textAreaY + 97, '', style);
+		this.circleScore = this.game.add.text(this.textAreaX + 130, this.textAreaY + 97, '', style);
+		
+    //  Here we add a new animation called 'walk'
+    //  Because we didn't give any other parameters it's going to make an animation from all available frames in the 'mummy' sprite sheet
+
+    //  And this starts the animation playing by using its key ("walk")
+    //  30 is the frame rate (30fps)
+    //  true means it will loop when it finishes
 
 		this.refreshStats(0);
 
@@ -94,6 +101,11 @@ export default {
 			return;
 		}
 
+		this.loader = this.game.add.sprite(this.textAreaX + 180, this.textAreaY + 167, 'loader');
+    var loadingAnimation = this.loader.animations.add('loadingAnimation');
+  	this.loader.animations.play('loadingAnimation', 30, true);
+
+		
 		const headers = {
 			'Access-Control-Allow-Origin': '*',
 			'Content-Type': 'application/json',
@@ -117,9 +129,6 @@ export default {
 		};
 
 		let JSONData = JSON.stringify(data);
-
-		console.log(JSON.parse(JSONData));
-		console.log('sending results');
 
 		axios.post('https://ocd-node.herokuapp.com/result', JSONData, { headers: headers })
 			.then((res, err) => {
