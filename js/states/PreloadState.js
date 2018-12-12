@@ -1,5 +1,4 @@
-import { circle } from '../../assets/images/*.png'
-import { button } from '../../assets/images/*.svg'
+import { circle, button } from '../../assets/images/*.png'
 
 export default {
     preload: function() {

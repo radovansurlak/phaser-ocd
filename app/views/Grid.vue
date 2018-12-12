@@ -14,9 +14,9 @@ export default {
   name: "GridGame",
   mounted() {
     let game = new Phaser.Game({
-			width: 640,
-			height: 360,
-			renderer: Phaser.AUTO,
+			width: window.innerWidth * window.devicePixelRatio,
+			height: window.innerHeight * window.devicePixelRatio,
+			renderer: Phaser.CANVAS,
 			antialias: true,
 			parent: this.$el,
 		});

@@ -23,12 +23,17 @@ export default {
 	//executed after everything is loaded
 	create: function () {
 
+		let windowWidth = document.body.getBoundingClientRect().width;
+		let viewportCenter = windowWidth / 2;
+		let isMobile = windowWidth < 450;
+
 		// Let's set a number of constants, so they can be changed later
 		this.NUM_ROWS = 13;
 		this.NUM_COLS = 13;
 		this.NUM_CIRCLES = 13;
-		this.BLOCK_SIZE = 20;
-		this.SCALE_CIRCLE = this.BLOCK_SIZE / 85 * 0.6;
+		this.BLOCK_SIZE = 40;
+		// this.BLOCK_SIZE = 20;
+		this.SCALE_CIRCLE = this.BLOCK_SIZE / 85 * 0.9;
 		this.GRID_WIDTH = 1;
 		this.GRID_START_X = 40;
 		this.GRID_START_Y = 40;
@@ -52,14 +57,14 @@ export default {
 		// initialise circle counter
 		this.circlesLeft = this.NUM_CIRCLES;
 
-		var style = { font: '15px Arial', fill: '#000' };
-		this.game.add.text(350, 40, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
-		this.game.add.text(350, 100, 'Circles left: ', style);
+		var style = { font: '20px Roboto', fill: '#000' };
+		this.game.add.text(viewportCenter, 100, 'Drag all the circles from the centre\nand place them anywhere on the grid. ', style);
+		this.game.add.text(viewportCenter, 180, 'Circles left: ', style);
 
-		let button = this.game.add.button(350, 150, 'button', this.onDoneButtonClick, this, 2, 1, 0);
+		let button = this.game.add.button(viewportCenter - 15, 210, 'button', this.onDoneButtonClick, this, 2, 1, 0);
 
-		style = { font: '25px Arial', fill: '#0d50bc' };
-		this.circleScore = this.game.add.text(450, 95, '', style);
+		style = { font: '25px Roboto', fill: '#0d50bc' };
+		this.circleScore = this.game.add.text(viewportCenter + 140, 176, '', style);
 
 		this.refreshStats(0);
 
