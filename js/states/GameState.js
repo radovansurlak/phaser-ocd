@@ -24,7 +24,7 @@ export default {
 	create: function () {
 
 		let windowWidth = document.body.getBoundingClientRect().width;
-		let isMobile = windowWidth < 500;
+		let isMobile = windowWidth < 600;
 
 
 		// Let's set a number of constants, so they can be changed later
@@ -35,13 +35,13 @@ export default {
 		// this.BLOCK_SIZE = 20;
 		this.SCALE_CIRCLE = this.BLOCK_SIZE / 85 * 0.8;
 		this.GRID_WIDTH = 1;
-		this.GRID_START_X = 40;
-		this.GRID_START_Y = 40;
+		this.GRID_START_X = isMobile ? 40 : windowWidth * 0.1;
+		this.GRID_START_Y = isMobile ? 40 : windowWidth * 0.03;
 		this.GRID_END_X = this.NUM_COLS * this.BLOCK_SIZE;
 		this.GRID_END_Y = this.NUM_ROWS * this.BLOCK_SIZE;
 
-		let textAreaY = isMobile ? this.GRID_END_Y + 100 : 220;
-		let textAreaX = isMobile ? windowWidth : this.GRID_END_X + 100;
+		let textAreaY = isMobile ? this.GRID_END_Y + this.GRID_START_Y + 100 : 220;
+		let textAreaX = isMobile ? windowWidth / 2 : this.GRID_START_X + this.GRID_END_X + 30;
 
 		// create a Rectangle frame around grid (invisible)
 		this.frame = new Phaser.Rectangle(this.GRID_START_X, this.GRID_START_Y, this.GRID_END_X, this.GRID_END_Y);
