@@ -80,7 +80,7 @@ export default {
 		},
 		options: {
 			genders: ['Male', 'Female'],
-			ageGroup: ["10 - 15", "16 - 20", "21 - 30", "31 - 45"],
+			ageGroup: ["0 - 6", "7 - 11", "12 - 19", "20 - 30", "31 - 40", "41 - 50", "51 - 60", "60+"],
 			educationLevel: [
 				"Primary education",
 				"Secondary education",
