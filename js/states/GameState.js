@@ -136,7 +136,8 @@ export default {
 			.then((res, err) => {
 				if (err) return console.error(err);
 				console.log(res);
-				alert(res.data.result);
+				let { results } = res.data;
+				alert(`Total order of symmetry = '${results[0]}+${results[1]}' = '${results[0]}' Rotations + '${results[1]}' Reflections`);
 				// localStorage.setItem('gridTestDone', true);
 				this.spriteIdCounter = 1;
 				this.redirectHome();
