@@ -30,7 +30,8 @@
 										Play Ferry Game
 									</v-btn>
 									<v-spacer></v-spacer>
-									<v-btn large :disabled="!formFilled || testCompletion.gridTest" @click="playGame('grid')"> 
+									<!-- <v-btn large :disabled="!formFilled || testCompletion.gridTest" @click="playGame('grid')">  -->
+									<v-btn large @click="playGame('grid')"> 
 										Play Grid Game
 									</v-btn>
 								</v-card-actions>

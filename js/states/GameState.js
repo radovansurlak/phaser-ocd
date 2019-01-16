@@ -91,11 +91,11 @@ export default {
 
 	onDoneButtonClick() {
 		
-		if (localStorage.getItem('gridTestDone') === 'true') {
-			alert('You have already taken this test, you cannot submit your results more than once');
-			this.redirectHome();
-			return;
-		}
+		// if (localStorage.getItem('gridTestDone') === 'true') {
+		// 	alert('You have already taken this test, you cannot submit your results more than once');
+		// 	this.redirectHome();
+		// 	return;
+		// }
 		if (!!this.circlesLeft) {
 			alert('You have to place all the remaining circles on the grid');
 			return;
