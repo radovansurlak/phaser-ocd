@@ -30,8 +30,7 @@
 										Play Ferry Game
 									</v-btn>
 									<v-spacer></v-spacer>
-									<!-- <v-btn large :disabled="!formFilled || testCompletion.gridTest" @click="playGame('grid')">  -->
-									<v-btn large @click="playGame('grid')"> 
+									<v-btn large :disabled="!formFilled || testCompletion.gridTest" @click="playGame('grid')"> 
 										Play Grid Game
 									</v-btn>
 								</v-card-actions>
@@ -100,14 +99,14 @@ export default {
 		dataConsentText: 'I agree to submit my anonymous data for academic research'
 	}),
 	mounted() {
-		if (localStorage.gridTestDone) {
-			this.testCompletion.gridTest = true
-		}
+		// if (localStorage.gridTestDone) {
+		// 	this.testCompletion.gridTest = true
+		// }
 	},
 	watch:{
     $route (to, from) {
 			if (from.path.match(/grid/)) {
-				this.testCompletion.gridTest = true
+				// this.testCompletion.gridTest = true
 			}
     }
 	},

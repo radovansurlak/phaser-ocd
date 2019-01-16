@@ -96,6 +96,7 @@ export default {
 		// 	this.redirectHome();
 		// 	return;
 		// }
+
 		if (!!this.circlesLeft) {
 			alert('You have to place all the remaining circles on the grid');
 			return;
@@ -103,7 +104,8 @@ export default {
 
 		this.loader = this.game.add.sprite(this.textAreaX + 180, this.textAreaY + 167, 'loader');
     var loadingAnimation = this.loader.animations.add('loadingAnimation');
-  	this.loader.animations.play('loadingAnimation', 30, true);
+		this.loader.animations.play('loadingAnimation', 30, true);
+		
 
 		
 		const headers = {
@@ -130,10 +132,13 @@ export default {
 
 		let JSONData = JSON.stringify(data);
 
-		axios.post('https://ocd-node.herokuapp.com/result', JSONData, { headers: headers })
+		axios.post('/result', JSONData, { headers: headers })
 			.then((res, err) => {
 				if (err) return console.error(err);
-				localStorage.setItem('gridTestDone', true);
+				console.log(res);
+				alert(res.data.result);
+				// localStorage.setItem('gridTestDone', true);
+				this.spriteIdCounter = 1;
 				this.redirectHome();
 				return;
 			})
